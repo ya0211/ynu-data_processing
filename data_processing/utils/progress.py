@@ -12,7 +12,7 @@ class Progress:
             '''
             do something
             '''
-            pro.progress_default(index)
+            pro.progress_default()
     """
     def __init__(self, total: int, bar_length=100):
         """
@@ -27,20 +27,21 @@ class Progress:
         """
         self._total = total
         self._start_time_total = time.time()
-        self._start_time_last = time.time()
+        self._start_time_last = self._start_time_total
         self._bar_length = bar_length
+        self._progress = 0
 
-    def progress_default(self, progress: int):
+    def progress_default(self):
         """
         Style:
             100%|####| 100/100 [0:59, 10s/it]
         """
-        progress += 1
+        self._progress += 1
 
-        percentage = int((progress / self._total) * 100)
-        show_finished = "#" * int(progress * self._bar_length / self._total)
-        show_needed = " " * (self._bar_length - int(progress * self._bar_length / self._total))
-        proportion = "{0}/{1}".format(progress, self._total)
+        percentage = int((self._progress / self._total) * 100)
+        show_finished = "#" * int(self._progress * self._bar_length / self._total)
+        show_needed = " " * (self._bar_length - int(self._progress * self._bar_length / self._total))
+        proportion = "{0}/{1}".format(self._progress, self._total)
 
         total_time_minute = int((time.time() - self._start_time_total) / 60)
         total_time_second = int((time.time() - self._start_time_total) % 60)
