@@ -69,6 +69,35 @@ class TextProcessing:
         else:
             return False
 
+    def info_journey(self, text: list):
+        """
+        to do
+        """
+        time, place = [None, None]
+        for txt in text:
+            if self.text_match('抱歉，没有找到您的行程数据', txt):
+                time = '未知'
+                break
+
+            elif self.text_match('更新于', txt):
+                time = txt.replace('更新于：', '').replace('：', ':')
+
+            elif self.text_match('您于前14天内到达或途经', txt):
+                place = txt.split('：')[-1]
+                for index in range(text.index(txt) + 1, len(text)):
+                    if self.text_match('结果包含您在前14天内到访的国家', text[index]):
+                        break
+                    else:
+                        place += text[index].replace('，', ',')
+        return time, place
+
+    def info_healthy(self, text: list):
+        """
+        to do
+        """
+        time, color = [None, None]
+        return time, color
+
     def info_match(self, text: list) -> list:
         """
         健康码将被排除, 只匹配行程码信息, 待优化
@@ -78,24 +107,22 @@ class TextProcessing:
         text:
              text to match
         """
-        time, place = None, None
-        for index_1 in range(0, len(text)):
-            if self.text_match('云南健康码', text[index_1]):
+        time_info_journey, place_info_journey = [None, None]
+        time_info_healthy, color_info_healthy = [None, None]
+        for txt in text:
+            if self.text_match('云南健康码', txt):
+                time_info_healthy,  color_info_healthy = self.info_healthy(text)
                 break
 
-            if self.text_match('更新于', text[index_1]):
-                time = text[index_1].replace('更新于：', '').replace('：', ':')
+            elif self.text_match('通信大数据行程卡', txt):
+                time_info_journey, place_info_journey = self.info_journey(text)
+                break
 
-            if self.text_match('您于前14天内到达或途经', text[index_1]):
-                place = text[index_1].split('：')[-1]
-                for index_2 in range(index_1 + 1, len(text)):
-                    if self.text_match('结果包含您在前14天内到访的国家', text[index_2]) or \
-                            self.text_match('色卡仅对到访地作提醒', text[index_2]):
-                        break
-                    else:
-                        place += text[index_2].replace('，', ',')
+            elif self.text_match('CXMYD', txt):
+                time_info_journey, place_info_journey = '短信查询', None
+                break
 
             if self._show_log is True:
-                self._logger.debug("{0}: credibility={1}".format(text[index_1], self._credibility))
+                self._logger.debug("{0}: credibility={1}".format(txt, self._credibility))
             self._credibility.clear()
-        return [time, place]
+        return [[time_info_journey, place_info_journey], [time_info_healthy, color_info_healthy]]
