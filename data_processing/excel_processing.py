@@ -12,7 +12,7 @@ class ExcelProcessing:
         excel_p.get_index_tag_header('header1', 'header2', 'header3', 'header4')
         all = excel_p.filter_data()
 
-        for one in all
+        for one in all:
             header1, header2, header3, header4 = one
             '''
             do something

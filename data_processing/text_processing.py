@@ -123,6 +123,6 @@ class TextProcessing:
                 break
 
             if self._show_log is True:
-                self._logger.debug("{0}: credibility={1}".format(txt, self._credibility))
+                self._logger.debug("text_match: {0}: credibility={1}".format(txt, self._credibility))
             self._credibility.clear()
         return [[time_info_journey, place_info_journey], [time_info_healthy, color_info_healthy]]
