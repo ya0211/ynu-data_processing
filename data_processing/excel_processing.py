@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+from numpy import ndarray
 import warnings
 
 
@@ -9,14 +11,11 @@ class ExcelProcessing:
     ::
 
         excel_p = ExcelProcessing("excel.xlsx", sheet_name='Sheet1')
-        excel_p.get_index_tag_header('header1', 'header2', 'header3', 'header4')
-        all = excel_p.filter_data()
+        all = excel_p.filter_data_horizontal('header1', 'header2', 'header3', 'header4')
 
         for one in all:
             header1, header2, header3, header4 = one
-            '''
-            do something
-            '''
+            pass
     """
     def __init__(self, excel_file_dir, sheet_name):
         """
@@ -43,27 +42,40 @@ class ExcelProcessing:
         """
         return [header for header in self._data_xlsx]
 
-    def get_index_tag_header(self, *args) -> list:
-        """
-        Get the index of headers
-
-        Parameters
-        ----------
-        args:
-            Specify the headers you need, unlimited number
-
-        """
+    def _get_index_tag_header(self, *args) -> list:
         excel_header = self.get_excel_header()
         for tag in args:
             if tag in excel_header:
                 self._tag_index.append(excel_header.index(tag))
         return self._tag_index
 
-    def filter_data(self) -> list:
+    def filter_data_horizontal(self, *args) -> ndarray:
         """
-        Filter data according to the information specified in `get_index_tag_header` and return
+        Filter data according to the information specified
+
+        Parameters
+        ----------
+        args:
+            Specify the headers you need
+
         """
+        self._tag_index = self._get_index_tag_header(*args)
         for data_initial in self._data_xlsx.values:
             data_person = [data_initial[tag_index] for tag_index in self._tag_index]
             self._data_target.append(data_person)
-        return self._data_target
+        return np.array(self._data_target)
+
+    def filter_data_vertical(self, *args) -> ndarray:
+        """
+        Filter data according to the information specified
+
+        Parameters
+        ----------
+        args:
+            Specify the headers you need
+
+        """
+        self.filter_data_horizontal(*args)
+        data_target = [[self._data_target[i][j] for i in range(0, len(self._data_target))]
+                       for j in range(0, len(args))]
+        return np.array(data_target)
